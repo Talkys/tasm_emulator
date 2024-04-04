@@ -1,7 +1,10 @@
 package main
 
+import "cpu"
+
 func main() {
-	c := new_cpu()
+
+	c := cpu.New_cpu()
 
 	/*program1 := []uint32{
 		0x01ABBA05, // li ABBA $5   ; Load IP A.B.B.A to $5
@@ -39,8 +42,8 @@ func main() {
 		0x1F000000,            // 0B Halt
 	}
 
-	c.load_program(program2)
-	c.exec_program()
+	c.Load_program(program2)
+	c.Exec_program()
 	//fmt.Println(int32(c.reg[1]))
 	//fmt.Println("")
 }

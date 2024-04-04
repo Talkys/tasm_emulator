@@ -1,4 +1,4 @@
-package main
+package cpu
 
 func jmp(c *cpu, op1, op2, op3 uint32) {
 	// jmp 16 bit addr_literal

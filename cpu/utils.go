@@ -1,4 +1,4 @@
-package main
+package cpu
 
 /*Convert uint32 to 4 uint8*/
 func ui32to4ui8(num uint32) [4]uint8 {

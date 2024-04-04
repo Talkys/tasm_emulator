@@ -1,4 +1,4 @@
-package main
+package cpu
 
 func and(c *cpu, op1, op2, op3 uint32) {
 	// and $1 & $2 -> $3

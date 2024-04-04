@@ -1,4 +1,4 @@
-package main
+package cpu
 
 func nop(c *cpu, op1, op2, op3 uint32) {
 	c.pc += PC_INCREMENT

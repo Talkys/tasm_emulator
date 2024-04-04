@@ -1,4 +1,4 @@
-package main
+package cpu
 
 func sw(c *cpu, op1, op2, op3 uint32) {
 	// sw reg op1 -> data[reg op2]

@@ -1,4 +1,4 @@
-package main
+package cpu
 
 const (
 	MEM_SIZE  = 4 * 1024 // 4kb = 1024 instructions of 32 bits
@@ -62,7 +62,7 @@ type cpu struct {
 	data [DATA_SIZE]uint8
 }
 
-func new_cpu() cpu {
+func New_cpu() cpu {
 	var c cpu
 	c.pc = 0
 	c.halt = false
@@ -75,7 +75,7 @@ func new_cpu() cpu {
 	return c
 }
 
-func (c *cpu) exec_inst(inst uint32) {
+func (c *cpu) Exec_inst(inst uint32) {
 
 	word := ui32to4ui8(inst)
 	/*if word[0] != 0 {
@@ -98,15 +98,15 @@ func (c *cpu) exec_inst(inst uint32) {
 	c.reg[0] = 0
 }
 
-func (c *cpu) exec_program() {
+func (c *cpu) Exec_program() {
 	for !c.halt {
 		word := c.mem[c.pc : c.pc+PC_INCREMENT]
 		inst := ui32fr4ui8([4]uint8(word))
-		c.exec_inst(inst)
+		c.Exec_inst(inst)
 	}
 }
 
-func (c *cpu) load_program(program []uint32) {
+func (c *cpu) Load_program(program []uint32) {
 	program_size := len(program)
 	if program_size*4 > MEM_SIZE {
 		return
