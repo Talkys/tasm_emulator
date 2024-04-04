@@ -1,6 +1,6 @@
 package main
 
-import "cpu"
+import "tasm/cpu"
 
 func main() {
 
