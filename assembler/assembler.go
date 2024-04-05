@@ -57,9 +57,25 @@ func ui32fr4ui8(num [4]uint8) uint32 {
 	return output
 }
 
-func Assemble(program []string) []uint32 {
+func parse_op(op_str string) uint8 {
+	var op uint8
+	if strings.Contains(op_str, "x") {
+		op_str = strings.ReplaceAll(op_str, "x", "")
+		res, _ := strconv.ParseInt(op_str, 16, 8)
+		op = uint8(res)
+	} else {
+		res, _ := strconv.ParseInt(op_str, 10, 8)
+		op = uint8(res)
+	}
+	return op
+}
+
+func Assemble(program []string) ([]uint32, []uint32) {
 
 	code := []uint32{}
+
+	program = pre_process_macros(program)
+	program, jmp_table := label_macros(program)
 
 	for l, line := range program {
 		for opcode, value := range opcode_map {
@@ -70,61 +86,71 @@ func Assemble(program []string) []uint32 {
 			line = strings.Replace(line, reg, ridx, -1)
 		}
 		program[l] = line
-		fmt.Println(program[l])
 	}
 
 	for _, line := range program {
 		args := strings.Split(line, ",")
 		if len(args) != 4 {
-			panic("Linha inválida " + line + "\n")
+			panic("Linha inválida {" + line + "}\n")
 		}
 
-		op_str := args[0]
-		var opcode uint8
-		if strings.Contains(op_str, "x") {
-			op_str = strings.ReplaceAll(op_str, "x", "")
-			res, _ := strconv.ParseInt(op_str, 16, 8)
-			opcode = uint8(res)
-		} else {
-			res, _ := strconv.ParseInt(op_str, 10, 8)
-			opcode = uint8(res)
-		}
-
-		op1_str := args[1]
-		var op1 uint8
-		if strings.Contains(op1_str, "x") {
-			op1_str = strings.ReplaceAll(op1_str, "x", "")
-			res, _ := strconv.ParseInt(op1_str, 16, 8)
-			op1 = uint8(res)
-		} else {
-			res, _ := strconv.ParseInt(op1_str, 10, 8)
-			op1 = uint8(res)
-		}
-
-		op2_str := args[2]
-		var op2 uint8
-		if strings.Contains(op2_str, "x") {
-			op2_str = strings.ReplaceAll(op2_str, "x", "")
-			res, _ := strconv.ParseInt(op2_str, 16, 8)
-			op2 = uint8(res)
-		} else {
-			res, _ := strconv.ParseInt(op2_str, 10, 8)
-			op2 = uint8(res)
-		}
-
-		op3_str := args[3]
-		var op3 uint8
-		if strings.Contains(op3_str, "x") {
-			op3_str = strings.ReplaceAll(op3_str, "x", "")
-			res, _ := strconv.ParseInt(op3_str, 16, 8)
-			op3 = uint8(res)
-		} else {
-			res, _ := strconv.ParseInt(op3_str, 10, 8)
-			op3 = uint8(res)
-		}
+		opcode := parse_op(args[0])
+		op1 := parse_op(args[1])
+		op2 := parse_op(args[2])
+		op3 := parse_op(args[3])
 
 		inst := ui32fr4ui8([4]uint8{opcode, op1, op2, op3})
 		code = append(code, inst)
 	}
-	return code
+	return code, jmp_table
+}
+
+func pre_process_macros(program []string) []string {
+	replace_map := map[string]string{
+		"nop": "nop,0,0,0",
+		"hlt": "hlt,0,0,0",
+	}
+
+	for l, line := range program {
+		line = strings.ReplaceAll(line, " ", "")
+		for key, value := range replace_map {
+			line = strings.ReplaceAll(line, key, value)
+		}
+		program[l] = line
+	}
+
+	return program
+}
+
+func label_macros(program []string) ([]string, []uint32) {
+	label_map := map[string]int{}
+	jmp_table := []uint32{}
+
+	//Inserir endereços das labels e trocar elas por nop
+	for l, line := range program {
+		if line[0] == ':' {
+			jmp_table = append(jmp_table, uint32(4*l))
+			label_map[line] = len(jmp_table) - 1
+			program[l] = "nop,0,0,0"
+		}
+	}
+
+	for l, line := range program {
+		for key, value := range label_map {
+			if strings.Contains(line, key) {
+				op1 := uint8((value >> TWO_BYTES) & 0xFF)
+				op2 := uint8((value >> ONE_BYTE) & 0xFF)
+				op3 := uint8((value) & 0xFF)
+
+				inst := fmt.Sprintf(",0x%02X,", op1)
+				inst += fmt.Sprintf("0x%02X,", op2)
+				inst += fmt.Sprintf("0x%02X", op3)
+
+				// Em teoria a label deve virar 0xXX,0xYY,0xZZ
+				program[l] = strings.ReplaceAll(program[l], key, inst)
+			}
+		}
+	}
+
+	return program, jmp_table
 }

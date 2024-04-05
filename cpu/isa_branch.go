@@ -3,10 +3,13 @@ package cpu
 func jmp(c *cpu, op1, op2, op3 uint32) {
 	// jmp 16 bit addr_literal
 	addr := uint32(0)
-	addr += op1 << ONE_BYTE
-	addr += op2
+	addr += op1 << TWO_BYTES
+	addr += op2 << ONE_BYTE
+	addr += op3
 
-	c.pc = int(addr & TWO_BYTE_MASK)
+	jmp_addr := c.jmp_table[addr]
+
+	c.pc = int(jmp_addr)
 }
 
 func beq(c *cpu, op1, op2, op3 uint32) {

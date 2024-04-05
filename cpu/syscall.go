@@ -3,7 +3,7 @@ package cpu
 import "fmt"
 
 // Syscall do sistema
-// Separado pq óbviamente vai ficar bem grande
+// Separado pq obviamente vai ficar bem grande
 // A única que vai usar importações também
 func sys(c *cpu, op1, op2, op3 uint32) {
 	/*

@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"tasm/assembler"
+	"tasm/cpu"
 )
 
 func main() {
@@ -14,11 +15,18 @@ func main() {
 	//fmt.Println("")
 
 	program := []string{
-		"li,0x05,$1,0",
-		"add,$1,$1,$1",
+		"li, 0x0A, $1, 0",
+		"li, 0x06, $2, 0",
+		"add, $1, $2, $3",
+		"sys, 0x01, 0, $3",
+		"hlt",
 	}
 
-	for _, line := range assembler.Assemble(program) {
-		fmt.Println(line)
+	binary, jmp_table := assembler.Assemble(program)
+	for _, line := range binary {
+		fmt.Printf("0x%08X\n", line)
 	}
+
+	c := cpu.New_cpu()
+	c.Load_program(binary, jmp_table)
 }

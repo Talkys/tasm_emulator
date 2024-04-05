@@ -1,10 +1,13 @@
 package cpu
 
+import "fmt"
+
 const (
-	MEM_SIZE  = 4 * 1024 // 4kb = 1024 instructions of 32 bits
-	DATA_SIZE = 65536    // 16 bit addr mem
-	REG_NUM   = 256      // Number of registers
-	OP_SIZE   = 32       // Number of operations
+	MEM_SIZE       = 4 * 1024 // 4kb = 1024 instructions of 32 bits
+	DATA_SIZE      = 65536    // 16 bit addr mem
+	REG_NUM        = 256      // Number of registers
+	OP_SIZE        = 32       // Number of operations
+	JMP_TABLE_SIZE = 16777216 //2 ^ 24 jmp labels possible
 
 	FOUR_BYTES  = 8 * 4
 	THREE_BYTES = 8 * 3
@@ -55,11 +58,12 @@ var (
 )
 
 type cpu struct {
-	mem  [MEM_SIZE]uint8
-	pc   int
-	reg  [REG_NUM]uint32
-	halt bool
-	data [DATA_SIZE]uint8
+	mem       [MEM_SIZE]uint8
+	pc        int
+	reg       [REG_NUM]uint32
+	halt      bool
+	data      [DATA_SIZE]uint8
+	jmp_table [JMP_TABLE_SIZE]uint32
 }
 
 func New_cpu() cpu {
@@ -106,7 +110,21 @@ func (c *cpu) Exec_program() {
 	}
 }
 
-func (c *cpu) Load_program(program []uint32) {
+func (c *cpu) Load_program(program []uint32, jmp_table []uint32) {
+
+	jmp_table_size := len(jmp_table)
+	if jmp_table_size > JMP_TABLE_SIZE {
+		return
+	}
+
+	copy(c.jmp_table[:], jmp_table)
+
+	for _, addr := range c.jmp_table {
+		if addr != 0 {
+			fmt.Println(addr)
+		}
+	}
+
 	program_size := len(program)
 	if program_size*4 > MEM_SIZE {
 		return
