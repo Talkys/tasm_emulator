@@ -13,7 +13,7 @@ func jmp(c *cpu, op1, op2, op3 uint32) {
 }
 
 func beq(c *cpu, op1, op2, op3 uint32) {
-	// beq if $2 = $3 jumps a line
+	// beq if $1 = $2 jumps a line
 	if c.reg[op1] == c.reg[op2] {
 		c.pc += PC_INCREMENT
 	}

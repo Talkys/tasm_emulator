@@ -15,10 +15,24 @@ func main() {
 	//fmt.Println("")
 
 	program := []string{
-		"li, 0x0A, $1, 0",
-		"li, 0x06, $2, 0",
+		"li, 0, 10, $1",
+		"li, 0, 0x0B, $2",
+		"beq, $1, $2, 0",
+		//False
+		"jmp :wasfalse",
+		//True
+		"jmp :wastrue",
+		":wasfalse",
 		"add, $1, $2, $3",
 		"sys, 0x01, 0, $3",
+		"sys, 0x02, 0, $1",
+		"jmp :end",
+		":wastrue",
+		"add, $1, $1, $3",
+		"sys, 0x01, 0, $3",
+		"sys, 0x02, 0, $1",
+		"jmp :end",
+		":end",
 		"hlt",
 	}
 
@@ -26,7 +40,9 @@ func main() {
 	for _, line := range binary {
 		fmt.Printf("0x%08X\n", line)
 	}
+	fmt.Println("--------------")
 
 	c := cpu.New_cpu()
 	c.Load_program(binary, jmp_table)
+	c.Exec_program()
 }

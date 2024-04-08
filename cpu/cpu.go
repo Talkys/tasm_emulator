@@ -1,7 +1,5 @@
 package cpu
 
-import "fmt"
-
 const (
 	MEM_SIZE       = 4 * 1024 // 4kb = 1024 instructions of 32 bits
 	DATA_SIZE      = 65536    // 16 bit addr mem
@@ -80,7 +78,7 @@ func New_cpu() cpu {
 }
 
 func (c *cpu) Exec_inst(inst uint32) {
-
+	//fmt.Printf("0x%08X\n", inst)
 	word := ui32to4ui8(inst)
 	/*if word[0] != 0 {
 		fmt.Print(c.pc)
@@ -119,11 +117,13 @@ func (c *cpu) Load_program(program []uint32, jmp_table []uint32) {
 
 	copy(c.jmp_table[:], jmp_table)
 
-	for _, addr := range c.jmp_table {
-		if addr != 0 {
-			fmt.Println(addr)
+	/*
+		for _, addr := range c.jmp_table {
+			if addr != 0 {
+				fmt.Println(addr)
+			}
 		}
-	}
+	*/
 
 	program_size := len(program)
 	if program_size*4 > MEM_SIZE {
